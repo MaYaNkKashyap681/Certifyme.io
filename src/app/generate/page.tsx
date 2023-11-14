@@ -1,5 +1,6 @@
 "use client"
 
+import Papa from 'papaparse';
 import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import { useFile } from '@/store/store';
 import PdfViewer from '../components/PdfViewer';
@@ -77,6 +78,39 @@ const Generate: React.FC<{}> = () => {
         link.click();
     };
 
+
+    const parseCSV = (csvFile: File): Promise<{ names: string[] }> => {
+        return new Promise((resolve, reject) => {
+            Papa.parse(csvFile, {
+                header: true,
+                dynamicTyping: true,
+                complete: (result) => {
+                    if (result.errors.length > 0) {
+                        reject(result.errors);
+                    } else {
+
+                        const names = result.data.map((row: any) => row.name); // Assuming 'Name' is the column header
+                        resolve({ names });
+                    }
+                },
+            });
+        });
+    };
+
+
+    const handleCSVInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file?.type === 'text/csv') {
+            const result = await parseCSV(file);
+            console.log(result.names);
+            const updatedList = result.names.map((name: string) => ({ name }));
+            // Update the state with the new array
+            setList((prevList: any) => [...prevList, ...updatedList]);
+        }
+    }
+
+
+
     return (
         <div className=' scrollbar-hide' >
             {
@@ -93,6 +127,13 @@ const Generate: React.FC<{}> = () => {
                             <div className="flex items-center mt-4">
                                 <label className="mr-2 text-white">Send Email:</label>
                                 <input type="checkbox" checked={sendEmail} onChange={handleEmailToggle} />
+                            </div>
+
+                            <div>
+                                <input type="file" id="csvFileInput" className="hidden" onChange={handleCSVInput} />
+                                <label htmlFor='csvFileInput' className='bg-green-500 p-1 text-xs text-white rounded-sm px-4 cursor-pointer'>
+                                    Insert Names CSV
+                                </label>
                             </div>
 
                             {!sendEmail && (
@@ -130,7 +171,7 @@ const Generate: React.FC<{}> = () => {
                                     {list.length !== 0 && (
                                         <>
                                             {list.map((item: any, index: number) => (
-                                                <div  className={`${index % 2 === 0 ? 'bg-transparent' : 'bg-gray-700'}`} key={index}>
+                                                <div className={`${index % 2 === 0 ? 'bg-transparent' : 'bg-gray-700'}`} key={index}>
                                                     {sendEmail ? `${item.name} ${item.email}` : item.name}
                                                 </div>
                                             ))}
