@@ -130,7 +130,7 @@ const Generate: React.FC<{}> = () => {
                                     {list.length !== 0 && (
                                         <>
                                             {list.map((item: any, index: number) => (
-                                                <div key={index}>
+                                                <div  className={`${index % 2 === 0 ? 'bg-transparent' : 'bg-gray-700'}`} key={index}>
                                                     {sendEmail ? `${item.name} ${item.email}` : item.name}
                                                 </div>
                                             ))}
@@ -147,7 +147,7 @@ const Generate: React.FC<{}> = () => {
 
                     <div className="mt-[1rem] text-white p-8">
                         <h3 className="text-white">Generated Files:</h3>
-                        <div className="p-1 border-white border-[1px] mt-[1rem] grid grid-cols-3 gap-4 p-2">
+                        <div className="p-2 border-white border-[1px] mt-[1rem] grid grid-cols-3 gap-4">
                             {generatedFiles.length !== 0 && (
                                 <>
                                     {generatedFiles.map((file, index) => (
