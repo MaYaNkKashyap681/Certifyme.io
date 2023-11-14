@@ -29,11 +29,6 @@ const Features = () => {
               Ensure your certificates look perfect before finalizing. Preview all the certificates at once
               to make sure names and details are accurate. No surprises—just professional, error-free certificates.
             </p>
-            <p className='mt-2'>
-              <a href='/certificate-preview' className='underline hover:text-yellow-300'>
-                Click here to preview all certificates
-              </a>
-            </p>
           </div>
         </div>
       </div>
