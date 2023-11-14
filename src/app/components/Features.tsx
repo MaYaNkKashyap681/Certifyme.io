@@ -1,16 +1,15 @@
 import React from "react";
 import Image from "next/image";
-import image1 from "../../assets/img1.png";
-import image2 from "../../assets/img2.png";
+import image1 from "./../../assets/img1.png";
+import image2 from "./../../assets/img2.png";
 
 const Features = () => {
   return (
     <div className="p-16 bg-red-500 text-white">
       <h2 className="text-4xl font-bold mb-8">Our Features</h2>
-      <div className="flex flex-col gap-16">
-        {/* Feature 1 */}
-        <div className="flex items-center justify-center flex-col">
-          <Image src={image1} alt="Feature 1" width={300} height={200} />
+      {/* <div className="flex flex-col gap-16">
+        <div className="flex items-center justify-center gap-4">
+          <Image src={image1} alt="Feature 1" width={600} height={200} />
           <div className="mt-4">
             <h3 className="text-xl font-bold mb-2">Add Desired Number of People</h3>
             <p>
@@ -20,9 +19,9 @@ const Features = () => {
           </div>
         </div>
 
-        {/* Feature 2 */}
-        <div className="flex items-center justify-center flex-col">
-          <Image src={image2} alt="Feature 2" width={300} height={200} />
+        
+        <div className="flex items-center justify-center flex-row-reverse gap-4">
+          <Image src={image2} alt="Feature 2" width={600} height={200} />
           <div className="mt-4">
             <h3 className="text-xl font-bold mb-2">Get the Preview of All Certificates</h3>
             <p>
@@ -31,7 +30,7 @@ const Features = () => {
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
