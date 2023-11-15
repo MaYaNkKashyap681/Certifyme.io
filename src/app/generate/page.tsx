@@ -127,7 +127,7 @@ const Generate: React.FC<{}> = () => {
                             <div className='w-full h-full bg-transparent absolute z-[30] flex flex-col gap-1'>
                                 {
                                     new Array(12).fill(0).map((_, index) => (
-                                        <div className={`h-[8.33%] ${selectedHeight === index ? 'bg-blue-800 bg-opacity-30' : 'bg-gray-800 bg-opacity-5 hover:bg-green-800 hover:backdrop-blur-2xl hover:backdrop-filter hover:bg-opacity-5'} rounded-md bg-clip-padding backdrop-filter backdrop-blur-xs  border border-gray-100 cursor-pointer `}
+                                        <div className={`h-[8.33%] ${selectedHeight === index ? 'bg-blue-800 bg-opacity-30' : 'bg-gray-800 bg-opacity-5 hover:bg-green-800 hover:backdrop-blur-2xl hover:backdrop-filter hover:bg-opacity-5'} rounded-md bg-clip-padding backdrop-filter backdrop-blur-xs  border border-gray-100 cursor-pointer `} key = {index}
 
                                             onClick={() => setSelectedHeight(index)}>
                                             {
