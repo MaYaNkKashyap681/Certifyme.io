@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { PDFDocument } from "pdf-lib";
+import { off } from "process";
 
 
 
@@ -36,10 +37,14 @@ const loadPdfAsBase64 = async (pdfPath: string) => {
 
 class CertificateNameWriter {
     private pdfPath: string;
+    private index: number;
+    private offset: number
 
-    constructor(pdfFile: string) {
+    constructor(pdfFile: string, index: number, offset: number) {
         console.log(pdfFile);
         this.pdfPath = pdfFile;
+        this.index = index;
+        this.offset = offset
     }
 
     async loadPdf() {
@@ -53,12 +58,14 @@ class CertificateNameWriter {
         const [firstPage] = pdfDoc.getPages();
 
         const { width, height } = firstPage.getSize();
+
+
         const fontSize = 40;
         const textWidth = receiver_name.length * (fontSize / 2);
         const x = (width - textWidth) / 2;
         firstPage.drawText(`${receiver_name}`, {
             x,
-            y: height / 2 - 10,
+            y: height - ((height / 12 * (this.index)) + this.offset),
             size: fontSize,
         });
 
@@ -80,9 +87,9 @@ interface CertificateFields {
     name: string;
 }
 
-export const generateCertificates = async (nameList: CertificateFields[], pdfFile: string) => {
+export const generateCertificates = async (nameList: CertificateFields[], pdfFile: string, index: number = 0, offset: number = 0) => {
     const nameOfRecivers = nameList.map((item) => item.name);
-    const modifierObj = new CertificateNameWriter(pdfFile);
+    const modifierObj = new CertificateNameWriter(pdfFile, index, offset);
 
     const modifiedPdfs = await modifierObj.multiCertificateGenerator(nameOfRecivers);
     return modifiedPdfs;

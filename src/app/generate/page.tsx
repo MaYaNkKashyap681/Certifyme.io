@@ -9,6 +9,7 @@ import { generateCertificates } from '../../lib/generationScript'
 import PdfPreview from '../components/PdfPreview';
 import JSZip from 'jszip';
 import { useRouter } from 'next/navigation';
+import { off } from 'process';
 
 const Generate: React.FC<{}> = () => {
     const { file } = useFile();
@@ -18,6 +19,9 @@ const Generate: React.FC<{}> = () => {
     const [email, setEmail] = useState<string>('');
     const [list, setList] = useState<any>([]);
     const [generatedFiles, setGeneratedFiles] = useState<Uint8Array[]>([]);
+    const [offset, setOffset] = useState<number>(0);
+
+    const [selectedHeight, setSelectedHeight] = useState<number>(0);
 
     const router = useRouter();
 
@@ -28,6 +32,8 @@ const Generate: React.FC<{}> = () => {
 
     useEffect(() => {
         getHeight();
+
+
     }, []);
 
     const handleEmailToggle = () => {
@@ -55,7 +61,7 @@ const Generate: React.FC<{}> = () => {
         if (file === null) {
             return;
         }
-        const output = await generateCertificates(list, file);
+        const output = await generateCertificates(list, file, selectedHeight, offset);
         setGeneratedFiles(output);
     };
 
@@ -118,6 +124,21 @@ const Generate: React.FC<{}> = () => {
                     <div className="flex w-full h-[100vh] px-2 relative ">
                         <div className="w-[70%] h-full relative" ref={certificateRef}>
                             {/* Your PdfViewer component */}
+                            <div className='w-full h-full bg-transparent absolute z-[30] flex flex-col gap-1'>
+                                {
+                                    new Array(12).fill(0).map((_, index) => (
+                                        <div className={`h-[8.33%] ${selectedHeight === index ? 'bg-blue-800 bg-opacity-30' : 'bg-gray-800 bg-opacity-5 hover:bg-green-800 hover:backdrop-blur-2xl hover:backdrop-filter hover:bg-opacity-5'} rounded-md bg-clip-padding backdrop-filter backdrop-blur-xs  border border-gray-100 cursor-pointer `}
+
+                                            onClick={() => setSelectedHeight(index)}>
+                                            {
+                                                selectedHeight === index && <p className='text-center text-[40px] font-semibold'>
+                                                    Receiver Name
+                                                </p>
+                                            }
+                                        </div>
+                                    ))
+                                }
+                            </div>
                             <PdfViewer file={file} />
                         </div>
                         <div className="w-[30%] overflow-x-scroll scrollbar-hide bg-transparent border-[1px] border-primary border-dotted rounded-2xl filter bg-opacity-20 backdrop-blur-3xl p-4">
@@ -134,6 +155,18 @@ const Generate: React.FC<{}> = () => {
                                 <label htmlFor='csvFileInput' className='bg-green-500 p-1 text-xs text-white rounded-sm px-4 cursor-pointer'>
                                     Insert Names CSV
                                 </label>
+                            </div>
+
+
+                            <div>
+                                <label className="block mb-2 text-white">Offset of Text:</label>
+                                <input
+                                    type="number"
+                                    value={offset}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setOffset(parseInt(e.target.value, 10))}
+                                    placeholder="Enter name"
+                                    className="w-full p-2 border rounded"
+                                />
                             </div>
 
                             {!sendEmail && (
