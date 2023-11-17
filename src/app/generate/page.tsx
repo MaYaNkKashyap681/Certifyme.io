@@ -9,7 +9,7 @@ import { generateCertificates } from '../../lib/generationScript'
 import PdfPreview from '../components/PdfPreview';
 import JSZip from 'jszip';
 import { useRouter } from 'next/navigation';
-import { off } from 'process';
+import { Trash2 } from 'lucide-react';
 
 const Generate: React.FC<{}> = () => {
     const { file } = useFile();
@@ -20,6 +20,8 @@ const Generate: React.FC<{}> = () => {
     const [list, setList] = useState<any>([]);
     const [generatedFiles, setGeneratedFiles] = useState<Uint8Array[]>([]);
     const [offset, setOffset] = useState<number>(0);
+
+    const [errors, setErrors] = useState<{nameError?: string, otherError?: string}>({nameError: '', otherError: ''})
 
     const [selectedHeight, setSelectedHeight] = useState<number>(0);
 
@@ -41,19 +43,21 @@ const Generate: React.FC<{}> = () => {
     };
 
     const handleAdd = () => {
-        let data;
-        if (sendEmail) {
-            data = { name: name, email: email };
-        } else {
-            data = { name: name };
+        if (!name) {
+            setErrors({
+                nameError: 'Name is Required'
+            })
+            return;
         }
-
+        let data;
+        data = { name: name, email: email };
         const arr = list;
         arr.push(data);
         setList(arr);
 
         setName('');
         setEmail('');
+        setErrors({nameError: ''})
     };
 
 
@@ -61,9 +65,27 @@ const Generate: React.FC<{}> = () => {
         if (file === null) {
             return;
         }
+
+        console.log(list);
         const output = await generateCertificates(list, file, selectedHeight, offset);
         setGeneratedFiles(output);
     };
+
+    const handleGenerateSample = async () => {
+        try {
+            if (file === null) {
+                return;
+            }
+            const output = await generateCertificates([{ name: "John Doe" }], file, selectedHeight, offset);
+            setGeneratedFiles(output);
+        }
+        catch (err) {
+            console.log('Something went Wrong');
+        }
+        finally {
+
+        }
+    }
 
     const handleDownloadAll = async () => {
         if (generatedFiles.length === 0) {
@@ -73,7 +95,7 @@ const Generate: React.FC<{}> = () => {
         const zip = new JSZip();
 
         for (let i = 0; i < generatedFiles.length; i++) {
-            const fileName = `certificate_${i + 1}.pdf`;
+            const fileName = `${list[i].name}-certificate_${i + 1}.pdf`;
             zip.file(fileName, generatedFiles[i]);
         }
 
@@ -115,6 +137,12 @@ const Generate: React.FC<{}> = () => {
         }
     }
 
+    const handleDeleteListItem = (index: number) => {
+        const newList = [...list];
+        newList.splice(index, 1);
+        setList(newList);
+    }
+
 
 
     return (
@@ -127,7 +155,7 @@ const Generate: React.FC<{}> = () => {
                             <div className='w-full h-full bg-transparent absolute z-[30] flex flex-col gap-1'>
                                 {
                                     new Array(12).fill(0).map((_, index) => (
-                                        <div className={`h-[8.33%] ${selectedHeight === index ? 'bg-blue-800 bg-opacity-30' : 'bg-gray-800 bg-opacity-5 hover:bg-green-800 hover:backdrop-blur-2xl hover:backdrop-filter hover:bg-opacity-5'} rounded-md bg-clip-padding backdrop-filter backdrop-blur-xs  border border-gray-100 cursor-pointer `} key = {index}
+                                        <div className={`h-[8.33%] ${selectedHeight === index ? 'bg-blue-800 bg-opacity-30' : 'bg-gray-800 bg-opacity-5 hover:bg-green-800 hover:backdrop-blur-2xl hover:backdrop-filter hover:bg-opacity-5'} rounded-md bg-clip-padding backdrop-filter backdrop-blur-xs  border border-gray-100 cursor-pointer `} key={index}
 
                                             onClick={() => setSelectedHeight(index)}>
                                             {
@@ -169,25 +197,42 @@ const Generate: React.FC<{}> = () => {
                                 />
                             </div>
 
-                            {!sendEmail && (
-                                <div className="mt-4">
-                                    <label className="block mb-2 text-white">Name:</label>
-                                    <input
-                                        type="text"
-                                        value={name}
-                                        onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-                                        placeholder="Enter name"
-                                        className="w-full p-2 border rounded"
-                                    />
-                                </div>
-                            )}
 
-                            <div className="flex flex-col gap-2">
+                            <div className="mt-4">
+                                <label className="block mb-2 text-white">Name of Receiver:</label>
+                                <input
+                                    type="text"
+                                    value={name}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                                    placeholder="Enter name"
+                                    className="w-full p-2 border rounded"
+                                />
+                            </div>
+                                {
+                                    errors?.nameError && <span className='text-xs text-red-600'>Name is Mandatory Field</span>
+                                }
+                            <div className="mt-4">
+                                <label className="block mb-2 text-white">Email of Receiver:</label>
+                                <input
+                                    type="text"
+                                    value={email}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                                    placeholder="Enter Email"
+                                    className="w-full p-2 border rounded"
+                                />
+                            </div>
+
+
+                            <div className="flex flex-col gap-1">
                                 <Button className="bg-primary mt-[1rem] text-xs" onClick={handleAdd}>
                                     Add Receiver
                                 </Button>
 
-                                <Button className=" bg-blue-500 mt-[1rem] text-xs" onClick={handleGenerate}>
+                                <Button className=" bg-yellow-500 mt-[1rem] text-xs hover:bg-yellow-300" onClick={handleGenerateSample}>
+                                    Generate Sample
+                                </Button>
+
+                                <Button className=" bg-blue-500 mt-[1rem] text-xs hover:bg-blue-300" onClick={handleGenerate}>
                                     Generate
                                 </Button>
 
@@ -204,8 +249,10 @@ const Generate: React.FC<{}> = () => {
                                     {list.length !== 0 && (
                                         <>
                                             {list.map((item: any, index: number) => (
-                                                <div className={`${index % 2 === 0 ? 'bg-transparent' : 'bg-gray-700'}`} key={index}>
-                                                    {sendEmail ? `${item.name} ${item.email}` : item.name}
+                                                <div className={`${index % 2 === 0 ? 'bg-transparent' : 'bg-gray-700'} relative group`} key={index} onClick={() => handleDeleteListItem(index)}>
+                                                    {item.email !== undefined ? `${item.name} ${item.email}` : item.name}
+
+                                                    <div className='absolute right-0 top-1/2 -translate-y-1/2 cursor-pointer bg-red-400 hidden group-hover:block' color='red'><Trash2 /></div>
                                                 </div>
                                             ))}
                                         </>
