@@ -21,7 +21,7 @@ const Generate: React.FC<{}> = () => {
     const [generatedFiles, setGeneratedFiles] = useState<Uint8Array[]>([]);
     const [offset, setOffset] = useState<number>(0);
 
-    const [errors, setErrors] = useState<{nameError?: string, otherError?: string}>({nameError: '', otherError: ''})
+    const [errors, setErrors] = useState<{ nameError?: string, otherError?: string }>({ nameError: '', otherError: '' })
 
     const [selectedHeight, setSelectedHeight] = useState<number>(0);
 
@@ -57,7 +57,7 @@ const Generate: React.FC<{}> = () => {
 
         setName('');
         setEmail('');
-        setErrors({nameError: ''})
+        setErrors({ nameError: '' })
     };
 
 
@@ -208,9 +208,9 @@ const Generate: React.FC<{}> = () => {
                                     className="w-full p-2 border rounded"
                                 />
                             </div>
-                                {
-                                    errors?.nameError && <span className='text-xs text-red-600'>Name is Mandatory Field</span>
-                                }
+                            {
+                                errors?.nameError && <span className='text-xs text-red-600'>Name is Mandatory Field</span>
+                            }
                             <div className="mt-4">
                                 <label className="block mb-2 text-white">Email of Receiver:</label>
                                 <input
@@ -221,6 +221,24 @@ const Generate: React.FC<{}> = () => {
                                     className="w-full p-2 border rounded"
                                 />
                             </div>
+
+                            <div className="mt-[1rem] text-white">
+                                <h3 className="text-white">List of Receivers:</h3>
+                                <div className="p-1 border-white border-[1px] mt-[1rem]">
+                                    {list.length !== 0 && (
+                                        <>
+                                            {list.map((item: any, index: number) => (
+                                                <div className={`${index % 2 === 0 ? 'bg-transparent' : 'bg-gray-700'} relative group`} key={index} onClick={() => handleDeleteListItem(index)}>
+                                                    {item.email !== undefined ? `${item.name} ${item.email}` : item.name}
+
+                                                    <div className='absolute right-0 top-1/2 -translate-y-1/2 cursor-pointer bg-red-400 hidden group-hover:block' color='red'><Trash2 /></div>
+                                                </div>
+                                            ))}
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
 
 
                             <div className="flex flex-col gap-1">
@@ -241,23 +259,6 @@ const Generate: React.FC<{}> = () => {
                                         Download All
                                     </Button>
                                 )}
-                            </div>
-
-                            <div className="mt-[1rem] text-white">
-                                <h3 className="text-white">List of Receivers:</h3>
-                                <div className="p-1 border-white border-[1px] mt-[1rem]">
-                                    {list.length !== 0 && (
-                                        <>
-                                            {list.map((item: any, index: number) => (
-                                                <div className={`${index % 2 === 0 ? 'bg-transparent' : 'bg-gray-700'} relative group`} key={index} onClick={() => handleDeleteListItem(index)}>
-                                                    {item.email !== undefined ? `${item.name} ${item.email}` : item.name}
-
-                                                    <div className='absolute right-0 top-1/2 -translate-y-1/2 cursor-pointer bg-red-400 hidden group-hover:block' color='red'><Trash2 /></div>
-                                                </div>
-                                            ))}
-                                        </>
-                                    )}
-                                </div>
                             </div>
 
 
